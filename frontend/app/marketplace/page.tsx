@@ -139,6 +139,7 @@ export default function Marketplace() {
   };
 
   const applyFilters = () => {
+    setLoading(true);
     fetchProperties();
   };
 

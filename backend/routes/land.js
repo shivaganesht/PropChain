@@ -25,80 +25,158 @@ router.get('/', async (req, res) => {
       const demoLands = [
         {
           _id: '1',
-          title: 'Downtown Commercial Building',
-          description: 'Prime commercial property in city center',
+          title: 'Luxury Villa in Goa',
+          description: 'Premium beachside villa with ocean view, private pool, and modern amenities',
           location: {
-            city: 'Denver',
-            state: 'Colorado',
-            country: 'USA'
+            city: 'Calangute',
+            state: 'Goa',
+            country: 'India'
           },
           size: {
-            value: 5000,
+            value: 4500,
             unit: 'sqft'
           },
           totalTokens: 1000,
           availableTokens: 750,
-          pricePerTokenUSD: 100,
-          propertyType: 'commercial',
+          pricePerTokenUSD: 150,
+          propertyType: 'residential',
           images: [],
           status: 'active',
           seller: {
             _id: '1',
-            name: 'Demo Seller',
-            email: 'seller@demo.com',
+            name: 'Rajesh Kumar',
+            email: 'rajesh@propchain.in',
             walletAddress: '0x1234...5678'
           }
         },
         {
           _id: '2',
-          title: 'Suburban Family Home',
-          description: 'Beautiful 4-bedroom home in quiet neighborhood',
+          title: 'Mumbai Business Center',
+          description: 'Prime commercial space in Bandra Kurla Complex with excellent connectivity',
           location: {
-            city: 'Boulder',
-            state: 'Colorado',
-            country: 'USA'
+            city: 'Mumbai',
+            state: 'Maharashtra',
+            country: 'India'
           },
           size: {
-            value: 2500,
+            value: 8000,
             unit: 'sqft'
           },
-          totalTokens: 500,
-          availableTokens: 300,
-          pricePerTokenUSD: 200,
-          propertyType: 'residential',
+          totalTokens: 2000,
+          availableTokens: 1200,
+          pricePerTokenUSD: 250,
+          propertyType: 'commercial',
           images: [],
           status: 'active',
           seller: {
             _id: '2',
-            name: 'John Doe',
-            email: 'john@demo.com',
+            name: 'Priya Sharma',
+            email: 'priya@propchain.in',
             walletAddress: '0x2345...6789'
           }
         },
         {
           _id: '3',
-          title: 'Agricultural Land',
-          description: 'Fertile farmland with water rights',
+          title: 'Bangalore Tech Park',
+          description: 'Modern IT office space in Whitefield with 24/7 facilities',
           location: {
-            city: 'Fort Collins',
-            state: 'Colorado',
-            country: 'USA'
+            city: 'Bangalore',
+            state: 'Karnataka',
+            country: 'India'
           },
           size: {
-            value: 10,
-            unit: 'acres'
+            value: 12000,
+            unit: 'sqft'
           },
-          totalTokens: 2000,
-          availableTokens: 1500,
-          pricePerTokenUSD: 50,
-          propertyType: 'agricultural',
+          totalTokens: 1500,
+          availableTokens: 900,
+          pricePerTokenUSD: 200,
+          propertyType: 'commercial',
           images: [],
           status: 'active',
           seller: {
             _id: '3',
-            name: 'Farm Owner',
-            email: 'farm@demo.com',
+            name: 'Amit Patel',
+            email: 'amit@propchain.in',
             walletAddress: '0x3456...7890'
+          }
+        },
+        {
+          _id: '4',
+          title: 'Delhi NCR Apartments',
+          description: 'Luxury 3BHK apartments in Gurgaon with clubhouse and amenities',
+          location: {
+            city: 'Gurgaon',
+            state: 'Haryana',
+            country: 'India'
+          },
+          size: {
+            value: 2200,
+            unit: 'sqft'
+          },
+          totalTokens: 800,
+          availableTokens: 600,
+          pricePerTokenUSD: 180,
+          propertyType: 'residential',
+          images: [],
+          status: 'active',
+          seller: {
+            _id: '4',
+            name: 'Neha Singh',
+            email: 'neha@propchain.in',
+            walletAddress: '0x4567...8901'
+          }
+        },
+        {
+          _id: '5',
+          title: 'Punjab Agricultural Land',
+          description: 'Fertile farmland in Punjab with irrigation facilities',
+          location: {
+            city: 'Ludhiana',
+            state: 'Punjab',
+            country: 'India'
+          },
+          size: {
+            value: 15,
+            unit: 'acres'
+          },
+          totalTokens: 2500,
+          availableTokens: 2000,
+          pricePerTokenUSD: 80,
+          propertyType: 'agricultural',
+          images: [],
+          status: 'active',
+          seller: {
+            _id: '5',
+            name: 'Harpreet Kaur',
+            email: 'harpreet@propchain.in',
+            walletAddress: '0x5678...9012'
+          }
+        },
+        {
+          _id: '6',
+          title: 'Hyderabad IT Hub',
+          description: 'State-of-the-art office complex in HITEC City',
+          location: {
+            city: 'Hyderabad',
+            state: 'Telangana',
+            country: 'India'
+          },
+          size: {
+            value: 10000,
+            unit: 'sqft'
+          },
+          totalTokens: 1800,
+          availableTokens: 1000,
+          pricePerTokenUSD: 220,
+          propertyType: 'commercial',
+          images: [],
+          status: 'active',
+          seller: {
+            _id: '6',
+            name: 'Venkat Reddy',
+            email: 'venkat@propchain.in',
+            walletAddress: '0x6789...0123'
           }
         }
       ];
