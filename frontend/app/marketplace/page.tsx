@@ -43,16 +43,25 @@ export default function Marketplace() {
 
   const fetchProperties = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/lands`, {
+      // Try to fetch from API
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const response = await axios.get(`${apiUrl}/lands`, {
         params: {
           status: 'active',
           ...filter
-        }
+        },
+        timeout: 5000 // 5 second timeout
       });
-      setProperties(response.data);
+      
+      if (response.data && Array.isArray(response.data)) {
+        setProperties(response.data);
+      } else {
+        // If no data or invalid format, use demo data
+        setProperties(getDemoProperties());
+      }
     } catch (error) {
-      console.error('Error fetching properties:', error);
-      // Use demo data if API fails
+      console.log('Using demo data for marketplace');
+      // Use demo data if API fails or is not available
       setProperties(getDemoProperties());
     } finally {
       setLoading(false);

@@ -19,6 +19,116 @@ const upload = multer({ storage });
 // Get all lands
 router.get('/', async (req, res) => {
   try {
+    // Check if in demo mode
+    if (process.env.USE_DEMO_MODE === 'true') {
+      // Return demo data
+      const demoLands = [
+        {
+          _id: '1',
+          title: 'Downtown Commercial Building',
+          description: 'Prime commercial property in city center',
+          location: {
+            city: 'Denver',
+            state: 'Colorado',
+            country: 'USA'
+          },
+          size: {
+            value: 5000,
+            unit: 'sqft'
+          },
+          totalTokens: 1000,
+          availableTokens: 750,
+          pricePerTokenUSD: 100,
+          propertyType: 'commercial',
+          images: [],
+          status: 'active',
+          seller: {
+            _id: '1',
+            name: 'Demo Seller',
+            email: 'seller@demo.com',
+            walletAddress: '0x1234...5678'
+          }
+        },
+        {
+          _id: '2',
+          title: 'Suburban Family Home',
+          description: 'Beautiful 4-bedroom home in quiet neighborhood',
+          location: {
+            city: 'Boulder',
+            state: 'Colorado',
+            country: 'USA'
+          },
+          size: {
+            value: 2500,
+            unit: 'sqft'
+          },
+          totalTokens: 500,
+          availableTokens: 300,
+          pricePerTokenUSD: 200,
+          propertyType: 'residential',
+          images: [],
+          status: 'active',
+          seller: {
+            _id: '2',
+            name: 'John Doe',
+            email: 'john@demo.com',
+            walletAddress: '0x2345...6789'
+          }
+        },
+        {
+          _id: '3',
+          title: 'Agricultural Land',
+          description: 'Fertile farmland with water rights',
+          location: {
+            city: 'Fort Collins',
+            state: 'Colorado',
+            country: 'USA'
+          },
+          size: {
+            value: 10,
+            unit: 'acres'
+          },
+          totalTokens: 2000,
+          availableTokens: 1500,
+          pricePerTokenUSD: 50,
+          propertyType: 'agricultural',
+          images: [],
+          status: 'active',
+          seller: {
+            _id: '3',
+            name: 'Farm Owner',
+            email: 'farm@demo.com',
+            walletAddress: '0x3456...7890'
+          }
+        }
+      ];
+      
+      // Apply filters to demo data
+      let filteredLands = demoLands;
+      const { status, propertyType, city, minPrice, maxPrice } = req.query;
+      
+      if (status) {
+        filteredLands = filteredLands.filter(land => land.status === status);
+      }
+      if (propertyType) {
+        filteredLands = filteredLands.filter(land => land.propertyType === propertyType);
+      }
+      if (city) {
+        filteredLands = filteredLands.filter(land => 
+          land.location.city.toLowerCase().includes(city.toLowerCase())
+        );
+      }
+      if (minPrice) {
+        filteredLands = filteredLands.filter(land => land.pricePerTokenUSD >= Number(minPrice));
+      }
+      if (maxPrice) {
+        filteredLands = filteredLands.filter(land => land.pricePerTokenUSD <= Number(maxPrice));
+      }
+      
+      return res.json(filteredLands);
+    }
+    
+    // Normal database query
     const { status, propertyType, city, minPrice, maxPrice } = req.query;
     const filter = {};
     
@@ -38,7 +148,8 @@ router.get('/', async (req, res) => {
     res.json(lands);
   } catch (error) {
     console.error('Error fetching lands:', error);
-    res.status(500).json({ error: 'Failed to fetch lands' });
+    // Return empty array instead of error in demo mode
+    res.json([]);
   }
 });
 

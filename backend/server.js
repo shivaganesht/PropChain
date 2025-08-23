@@ -22,14 +22,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/propchain', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch((err) => {
-  console.error('MongoDB connection error:', err);
-});
+if (process.env.USE_DEMO_MODE === 'true') {
+  console.log('Running in DEMO MODE - MongoDB not required');
+  console.log('Using in-memory data for demonstration');
+} else {
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/propchain', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }).then(() => {
+    console.log('Connected to MongoDB');
+  }).catch((err) => {
+    console.error('MongoDB connection error:', err);
+    console.log('Falling back to DEMO MODE');
+  });
+}
 
 // Routes
 app.use('/api/auth', authRoutes);

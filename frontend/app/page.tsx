@@ -3,9 +3,15 @@
 import Link from 'next/link';
 import { ArrowRight, Building2, Coins, Shield, Users } from 'lucide-react';
 import { useAccount } from 'wagmi';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { isConnected } = useAccount();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="space-y-16">

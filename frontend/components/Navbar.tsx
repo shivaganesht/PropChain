@@ -4,9 +4,15 @@ import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Home, Building, User, FileText } from 'lucide-react';
 import { useAccount } from 'wagmi';
+import { useEffect, useState } from 'react';
 
 export default function Navbar() {
   const { isConnected } = useAccount();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200">
