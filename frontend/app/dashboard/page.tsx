@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Plus, DollarSign, TrendingUp, Building, Eye, Edit, Zap, Globe, Sparkles } from 'lucide-react';
+import { Upload, Plus, DollarSign, TrendingUp, Building, Eye, Edit, Zap, Globe, Sparkles, Trash2 } from 'lucide-react';
 
 // Mock wallet connection
 const useAccount = () => ({
@@ -146,12 +146,14 @@ const TableRow = ({
   property, 
   index, 
   onView, 
-  onEdit 
+  onEdit,
+  onDelete 
 }: { 
   property: any; 
   index: number;
   onView: (property: any) => void;
   onEdit: (property: any) => void;
+  onDelete: (property: any) => void;
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -220,6 +222,13 @@ const TableRow = ({
           >
             <Edit className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
           </button>
+          <button 
+            onClick={() => onDelete(property)}
+            className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors group/btn"
+            title="Delete Property"
+          >
+            <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+          </button>
         </div>
       </td>
     </tr>
@@ -227,91 +236,171 @@ const TableRow = ({
 };
 
 // List Property Modal Component
-const ListPropertyModal = ({ onClose }: { onClose: () => void }) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
-    <FuturisticCard className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto" hover={false}>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-          List New Property
-        </h2>
-        <button 
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-200 transition-colors"
-        >
-          ✕
-        </button>
-      </div>
-      
-      <div className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-100 mb-2">Property Title</label>
-            <input 
-              type="text" 
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-100 focus:border-cyan-100 focus:outline-none transition-colors"
-              placeholder="Modern Office Complex"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-100 mb-2">Property Type</label>
-            <select className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 focus:border-cyan-500 focus:outline-none transition-colors">
-              <option>Commercial</option>
-              <option>Residential</option>
-              <option>Industrial</option>
-            </select>
-          </div>
+const ListPropertyModal = ({ onClose, onSave }: { 
+  onClose: () => void;
+  onSave: (newProperty: any) => void;
+}) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    type: 'Commercial',
+    description: '',
+    totalValue: 0,
+    totalTokens: 0,
+    tokenPrice: 0
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.totalTokens || !formData.totalValue) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    const newProperty = {
+      id: (Date.now()).toString(),
+      title: formData.title,
+      status: 'pending',
+      totalTokens: formData.totalTokens,
+      soldTokens: 0,
+      revenue: 0,
+      monthlyRent: Math.round(formData.totalValue * 0.01), // 1% of total value as monthly rent
+      description: formData.description,
+      type: formData.type,
+      totalValue: formData.totalValue,
+      tokenPrice: formData.tokenPrice
+    };
+    
+    onSave(newProperty);
+    onClose();
+  };
+
+  const handleSave = () => {
+    if (!formData.title || !formData.totalTokens || !formData.totalValue) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    const newProperty = {
+      id: (Date.now()).toString(),
+      title: formData.title,
+      status: 'pending',
+      totalTokens: formData.totalTokens,
+      soldTokens: 0,
+      revenue: 0,
+      monthlyRent: Math.round(formData.totalValue * 0.01), // 1% of total value as monthly rent
+      description: formData.description,
+      type: formData.type,
+      totalValue: formData.totalValue,
+      tokenPrice: formData.tokenPrice
+    };
+    
+    onSave(newProperty);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose}></div>
+      <FuturisticCard className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto" hover={false}>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            List New Property
+          </h2>
+          <button 
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-200 transition-colors"
+          >
+            ✕
+          </button>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
-          <textarea 
-            rows={4}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors resize-none"
-            placeholder="Describe your property..."
-          />
-        </div>
-        
-        <div className="grid md:grid-cols-3 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-100 mb-2">Property Title *</label>
+              <input 
+                type="text" 
+                value={formData.title}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+                placeholder="Modern Office Complex"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-100 mb-2">Property Type</label>
+              <select 
+                value={formData.type}
+                onChange={(e) => setFormData({...formData, type: e.target.value})}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 focus:border-cyan-500 focus:outline-none transition-colors"
+              >
+                <option value="Commercial">Commercial</option>
+                <option value="Residential">Residential</option>
+                <option value="Industrial">Industrial</option>
+              </select>
+            </div>
+          </div>
+          
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Total Value ($)</label>
-            <input 
-              type="number" 
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
-              placeholder="1000000"
+            <label className="block text-sm font-medium text-gray-100 mb-2">Description</label>
+            <textarea 
+              rows={4}
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors resize-none"
+              placeholder="Describe your property..."
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Total Tokens</label>
-            <input 
-              type="number" 
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
-              placeholder="1000"
-            />
+          
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-100 mb-2">Total Value ($) *</label>
+              <input 
+                type="number" 
+                value={formData.totalValue || ''}
+                onChange={(e) => setFormData({...formData, totalValue: parseInt(e.target.value) || 0})}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+                placeholder="1000000"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-100 mb-2">Total Tokens *</label>
+              <input 
+                type="number" 
+                value={formData.totalTokens || ''}
+                onChange={(e) => setFormData({...formData, totalTokens: parseInt(e.target.value) || 0})}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+                placeholder="1000"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-100 mb-2">Token Price ($)</label>
+              <input 
+                type="number" 
+                value={formData.tokenPrice || ''}
+                onChange={(e) => setFormData({...formData, tokenPrice: parseInt(e.target.value) || 0})}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+                placeholder="1000"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Token Price ($)</label>
-            <input 
-              type="number" 
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
-              placeholder="1000"
-            />
+          
+          <div className="flex justify-end gap-4 pt-4">
+            <GlowButton variant="outline" onClick={onClose}>
+              Cancel
+            </GlowButton>
+            <GlowButton variant="primary" onClick={handleSave}>
+              <Zap className="w-4 h-4" />
+              List Property
+            </GlowButton>
           </div>
-        </div>
-        
-        <div className="flex justify-end gap-4 pt-4">
-          <GlowButton variant="outline" onClick={onClose}>
-            Cancel
-          </GlowButton>
-          <GlowButton variant="primary" onClick={() => {}}>
-            <Zap className="w-4 h-4" />
-            List Property
-          </GlowButton>
-        </div>
-      </div>
-    </FuturisticCard>
-  </div>
-);
+        </form>
+      </FuturisticCard>
+    </div>
+  );
+};
 
 // Edit Property Modal Component
 const EditPropertyModal = ({ property, onClose, onSave }: { 
@@ -552,6 +641,19 @@ export default function Dashboard() {
     setSelectedProperty(null);
   };
 
+  const handleAddProperty = (newProperty: any) => {
+    setUserProperties(prevProperties => [...prevProperties, newProperty]);
+    setShowListModal(false);
+  };
+
+  const handleDeleteProperty = (propertyToDelete: any) => {
+    if (window.confirm(`Are you sure you want to delete "${propertyToDelete.title}"? This action cannot be undone.`)) {
+      setUserProperties(prevProperties => 
+        prevProperties.filter(property => property.id !== propertyToDelete.id)
+      );
+    }
+  };
+
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -681,6 +783,7 @@ export default function Dashboard() {
                     index={index}
                     onView={handleViewProperty}
                     onEdit={handleEditProperty}
+                    onDelete={handleDeleteProperty}
                   />
                 ))}
               </tbody>
@@ -690,7 +793,10 @@ export default function Dashboard() {
 
         {/* List Property Modal */}
         {showListModal && (
-          <ListPropertyModal onClose={() => setShowListModal(false)} />
+          <ListPropertyModal 
+            onClose={() => setShowListModal(false)} 
+            onSave={handleAddProperty}
+          />
         )}
 
         {/* Edit Property Modal */}
