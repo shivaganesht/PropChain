@@ -47,7 +47,7 @@ export default function Home() {
       <section className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 px-4">
         <div className="bg-white p-6 rounded-xl shadow-md">
           <Building2 className="h-12 w-12 text-blue-600 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Tokenized Properties</h3>
+          <h3 className="text-xl font-semibold mb-2 text-black">Tokenized Properties</h3>
           <p className="text-gray-600">
             Convert real estate into ERC1155 tokens for easy fractional ownership
           </p>
@@ -55,7 +55,7 @@ export default function Home() {
         
         <div className="bg-white p-6 rounded-xl shadow-md">
           <Coins className="h-12 w-12 text-green-600 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">AVAX Payments</h3>
+          <h3 className="text-xl font-semibold mb-2 text-black">AVAX Payments</h3>
           <p className="text-gray-600">
             Buy property tokens with AVAX using real-time Chainlink price feeds
           </p>
@@ -63,7 +63,7 @@ export default function Home() {
         
         <div className="bg-white p-6 rounded-xl shadow-md">
           <Shield className="h-12 w-12 text-purple-600 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Secure & Transparent</h3>
+          <h3 className="text-xl font-semibold mb-2 text-black">Secure & Transparent</h3>
           <p className="text-gray-600">
             Smart contracts ensure secure transactions and transparent ownership
           </p>
@@ -71,7 +71,7 @@ export default function Home() {
         
         <div className="bg-white p-6 rounded-xl shadow-md">
           <Users className="h-12 w-12 text-orange-600 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Fair Distribution</h3>
+          <h3 className="text-xl font-semibold mb-2 text-black">Fair Distribution</h3>
           <p className="text-gray-600">
             Chainlink VRF ensures fair token allocation among competing buyers
           </p>
@@ -80,13 +80,13 @@ export default function Home() {
 
       {/* How It Works */}
       <section className="bg-white rounded-2xl p-8 md:p-12">
-        <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 text-black">How It Works</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="text-center">
             <div className="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
               1
             </div>
-            <h3 className="text-xl font-semibold mb-2">List Property</h3>
+            <h3 className="text-xl font-semibold mb-2 text-black">List Property</h3>
             <p className="text-gray-600">
               Sellers upload property documents and set token quantity & price
             </p>
@@ -96,7 +96,7 @@ export default function Home() {
             <div className="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
               2
             </div>
-            <h3 className="text-xl font-semibold mb-2">Buy Tokens</h3>
+            <h3 className="text-xl font-semibold mb-2 text-black">Buy Tokens</h3>
             <p className="text-gray-600">
               Buyers purchase fractional ownership tokens with AVAX
             </p>
@@ -106,7 +106,7 @@ export default function Home() {
             <div className="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
               3
             </div>
-            <h3 className="text-xl font-semibold mb-2">Earn Returns</h3>
+            <h3 className="text-xl font-semibold mb-2 text-black">Earn Returns</h3>
             <p className="text-gray-600">
               Token holders receive automated rent distributions monthly
             </p>

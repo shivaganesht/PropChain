@@ -157,13 +157,13 @@ export default function Marketplace() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Filter Properties</h2>
+        <h2 className="text-lg font-semibold mb-4 text-black">Filter Properties</h2>
         <div className="grid md:grid-cols-4 gap-4">
           <select
             name="propertyType"
             value={filter.propertyType}
             onChange={handleFilterChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
           >
             <option value="">All Types</option>
             <option value="residential">Residential</option>
@@ -178,7 +178,7 @@ export default function Marketplace() {
             placeholder="City"
             value={filter.city}
             onChange={handleFilterChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
           />
           
           <input
@@ -187,7 +187,7 @@ export default function Marketplace() {
             placeholder="Min Price (USD)"
             value={filter.minPrice}
             onChange={handleFilterChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
           />
           
           <button
@@ -203,7 +203,7 @@ export default function Marketplace() {
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading properties...</p>
+          <p className="mt-4 text-black">Loading properties...</p>
         </div>
       ) : properties.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg">
@@ -211,7 +211,7 @@ export default function Marketplace() {
           <p className="text-gray-600">No properties found matching your criteria</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-black">
           {properties.map((property) => (
             <PropertyCard key={property._id} property={property} />
           ))}
