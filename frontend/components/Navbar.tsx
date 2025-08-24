@@ -2,16 +2,30 @@
 
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Home, Building, User, FileText } from 'lucide-react';
+import { Home, Building, User, FileText, Shield } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import { useEffect, useState } from 'react';
 
 export default function Navbar() {
   const { isConnected } = useAccount();
   const [mounted, setMounted] = useState(false);
+  const [showAdminLink, setShowAdminLink] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Check if admin is logged in by checking localStorage
+    const adminSession = localStorage.getItem('propchain_admin_session');
+    if (adminSession) {
+      try {
+        const session = JSON.parse(adminSession);
+        const now = new Date().getTime();
+        if (session.expiresAt > now) {
+          setShowAdminLink(true);
+        }
+      } catch (error) {
+        console.error('Error parsing admin session:', error);
+      }
+    }
   }, []);
 
   return (
@@ -59,6 +73,16 @@ export default function Navbar() {
                     <span>My Properties</span>
                   </Link>
                 </>
+              )}
+              
+              {showAdminLink && (
+                <Link
+                  href="/admin/dashboard"
+                  className="flex items-center space-x-1 text-purple-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium border border-purple-200 bg-purple-50"
+                >
+                  <Shield className="h-4 w-4" />
+                  <span>Admin Panel</span>
+                </Link>
               )}
             </div>
           </div>
