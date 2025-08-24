@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAdminAuth } from '../../../contexts/AdminAuthContext';
 import { 
   Shield, 
   Mail, 
@@ -13,6 +12,54 @@ import {
   AlertTriangle,
   Loader2
 } from 'lucide-react';
+
+// Simple auth function without context for login page
+const mockAdmins = [
+  {
+    id: 'admin_001',
+    email: 'admin@propchain.com',
+    password: 'admin123',
+    name: 'Super Admin',
+    role: 'super_admin' as const,
+    permissions: ['*']
+  },
+  {
+    id: 'admin_002', 
+    email: 'moderator@propchain.com',
+    password: 'mod123',
+    name: 'Property Moderator',
+    role: 'moderator' as const,
+    permissions: ['properties.view', 'properties.approve', 'properties.reject', 'users.view']
+  },
+  {
+    id: 'admin_003',
+    email: 'analyst@propchain.com', 
+    password: 'analyst123',
+    name: 'Data Analyst',
+    role: 'admin' as const,
+    permissions: ['analytics.view', 'properties.view', 'users.view']
+  }
+];
+
+const authenticateAdmin = (email: string, password: string) => {
+  const admin = mockAdmins.find(a => a.email === email && a.password === password);
+  if (admin) {
+    const session = {
+      admin: {
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
+        permissions: admin.permissions,
+        lastLogin: new Date().toISOString()
+      },
+      expiresAt: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 hours
+    };
+    localStorage.setItem('propchain_admin_session', JSON.stringify(session));
+    return true;
+  }
+  return false;
+};
 
 // Animated Background Component
 const AnimatedBackground = () => (
@@ -72,7 +119,6 @@ const DemoCredentials = () => (
 
 export default function AdminLogin() {
   const router = useRouter();
-  const { login, isLoading } = useAdminAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -88,7 +134,7 @@ export default function AdminLogin() {
     setIsSubmitting(true);
 
     try {
-      const success = await login(formData.email, formData.password);
+      const success = authenticateAdmin(formData.email, formData.password);
       
       if (success) {
         router.push('/admin/dashboard');
@@ -111,18 +157,6 @@ export default function AdminLogin() {
     // Clear error when user starts typing
     if (error) setError('');
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <AnimatedBackground />
-        <div className="flex items-center gap-3 text-gray-300">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span>Checking authentication...</span>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

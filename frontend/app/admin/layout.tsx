@@ -1,23 +1,52 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { AdminAuthProvider, useAdminAuth } from '../../contexts/AdminAuthContext';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import AdminSidebar from '../../components/AdminSidebar';
 import { Loader2 } from 'lucide-react';
+
+// Simple auth check without context
+const checkAdminAuth = (): { isAuthenticated: boolean; admin: any } => {
+  if (typeof window === 'undefined') return { isAuthenticated: false, admin: null };
+  
+  try {
+    const session = localStorage.getItem('propchain_admin_session');
+    if (!session) return { isAuthenticated: false, admin: null };
+    
+    const parsedSession = JSON.parse(session);
+    const now = new Date().getTime();
+    
+    if (parsedSession.expiresAt > now) {
+      return { isAuthenticated: true, admin: parsedSession.admin };
+    } else {
+      localStorage.removeItem('propchain_admin_session');
+      return { isAuthenticated: false, admin: null };
+    }
+  } catch (error) {
+    return { isAuthenticated: false, admin: null };
+  }
+};
 
 // Auth Guard Component
 function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { admin, isLoading, isAuthenticated } = useAdminAuth();
+  const pathname = usePathname();
+  const [authState, setAuthState] = useState<{ isLoading: boolean; isAuthenticated: boolean; admin: any }>({ 
+    isLoading: true, 
+    isAuthenticated: false, 
+    admin: null 
+  });
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    const auth = checkAdminAuth();
+    setAuthState({ isLoading: false, ...auth });
+    
+    if (!auth.isAuthenticated && pathname !== '/admin/login') {
       router.push('/admin/login');
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [router, pathname]);
 
-  if (isLoading) {
+  if (authState.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="flex items-center gap-3 text-gray-300">
@@ -28,7 +57,12 @@ function AdminAuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated) {
+  // Allow login page without authentication
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
+  if (!authState.isAuthenticated) {
     return null; // Will redirect to login
   }
 
@@ -45,7 +79,7 @@ function AdminAuthGuard({ children }: { children: React.ReactNode }) {
                   Admin Dashboard
                 </h1>
                 <p className="text-gray-400">
-                  Welcome back, {admin?.name} ({admin?.role})
+                  Welcome back, {authState.admin?.name} ({authState.admin?.role})
                 </p>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
@@ -68,10 +102,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AdminAuthProvider>
-      <AdminAuthGuard>
-        {children}
-      </AdminAuthGuard>
-    </AdminAuthProvider>
+    <AdminAuthGuard>
+      {children}
+    </AdminAuthGuard>
   );
 }

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { 
   LayoutDashboard, 
   Building, 
@@ -15,16 +14,36 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+// Simple admin info getter
+const getAdminInfo = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const session = localStorage.getItem('propchain_admin_session');
+    if (session) {
+      const parsedSession = JSON.parse(session);
+      return parsedSession.admin;
+    }
+  } catch (error) {
+    console.error('Error getting admin info:', error);
+  }
+  return null;
+};
 
 const AdminSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const { admin, logout, hasPermission } = useAdminAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [admin, setAdmin] = useState<any>(null);
+
+  useEffect(() => {
+    const adminInfo = getAdminInfo();
+    setAdmin(adminInfo);
+  }, []);
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('propchain_admin_session');
     router.push('/admin/login');
   };
 
