@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Shield, 
   Users, 
@@ -17,8 +17,13 @@ import {
   Settings,
   Search,
   Filter,
-  Download
+  Download,
+  RefreshCw,
+  DollarSign,
+  Activity,
+  Bell
 } from 'lucide-react';
+import AdminDataService from '../../../utils/adminDataService';
 
 // Mock admin authentication
 const useAdminAuth = () => ({
@@ -139,30 +144,52 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 // Quick Actions Panel
-const QuickActions = () => (
-  <FuturisticCard hover={false}>
-    <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center gap-2">
-      <Settings className="w-5 h-5 text-cyan-400" />
-      Quick Actions
-    </h3>
-    <div className="grid grid-cols-2 gap-3">
-      {[
-        { label: 'Review Properties', icon: FileText, color: 'from-blue-500 to-cyan-500' },
-        { label: 'AI Analysis', icon: Bot, color: 'from-purple-500 to-pink-500' },
-        { label: 'User Management', icon: Users, color: 'from-green-500 to-emerald-500' },
-        { label: 'Platform Settings', icon: Settings, color: 'from-orange-500 to-yellow-500' }
-      ].map((action, index) => (
-        <button
-          key={index}
-          className={`p-4 rounded-xl bg-gradient-to-r ${action.color} bg-opacity-20 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 group`}
-        >
-          <action.icon className="w-6 h-6 text-white mb-2 group-hover:scale-110 transition-transform" />
-          <p className="text-sm font-medium text-gray-100">{action.label}</p>
-        </button>
-      ))}
-    </div>
-  </FuturisticCard>
-);
+const QuickActions = () => {
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'review':
+        window.location.href = '/admin/properties/review';
+        break;
+      case 'ai':
+        window.location.href = '/admin/analytics';
+        break;
+      case 'users':
+        window.location.href = '/admin/users';
+        break;
+      case 'settings':
+        window.location.href = '/admin/settings';
+        break;
+      default:
+        console.log('Unknown action:', action);
+    }
+  };
+
+  return (
+    <FuturisticCard hover={false}>
+      <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center gap-2">
+        <Settings className="w-5 h-5 text-cyan-400" />
+        Quick Actions
+      </h3>
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          { label: 'Review Properties', icon: FileText, color: 'from-blue-500 to-cyan-500', action: 'review' },
+          { label: 'AI Analysis', icon: Bot, color: 'from-purple-500 to-pink-500', action: 'ai' },
+          { label: 'User Management', icon: Users, color: 'from-green-500 to-emerald-500', action: 'users' },
+          { label: 'Platform Settings', icon: Settings, color: 'from-orange-500 to-yellow-500', action: 'settings' }
+        ].map((action, index) => (
+          <button
+            key={index}
+            onClick={() => handleQuickAction(action.action)}
+            className={`p-4 rounded-xl bg-gradient-to-r ${action.color} bg-opacity-20 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 group`}
+          >
+            <action.icon className="w-6 h-6 text-white mb-2 group-hover:scale-110 transition-transform" />
+            <p className="text-sm font-medium text-gray-100">{action.label}</p>
+          </button>
+        ))}
+      </div>
+    </FuturisticCard>
+  );
+};
 
 // Recent Activity Feed
 const RecentActivity = () => {
@@ -197,6 +224,93 @@ const RecentActivity = () => {
 // Admin Dashboard Main Component
 export default function AdminDashboard() {
   const { isAdmin, adminName } = useAdminAuth();
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  
+  const dataService = new AdminDataService();
+
+  // Optimized data fetching with caching
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      const data = await dataService.getDashboardMetrics();
+      setDashboardData(data);
+      setLastRefresh(new Date());
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  // Initial data load with auto-refresh
+  useEffect(() => {
+    fetchDashboardData();
+    
+    // Auto-refresh every 30 seconds for real-time feel
+    const interval = setInterval(fetchDashboardData, 30000);
+    return () => clearInterval(interval);
+  }, [fetchDashboardData]);
+
+  const handleExportReport = () => {
+    if (!dashboardData) return;
+    
+    const csvContent = [
+      ['PropChain Admin Dashboard Report - ' + new Date().toLocaleDateString()],
+      ['Generated on', new Date().toISOString()],
+      [''],
+      ['Summary Statistics'],
+      ['Total Users', dashboardData.totalUsers],
+      ['Active Users', dashboardData.activeUsers],
+      ['Total Properties', dashboardData.totalProperties],
+      ['Pending Reviews', dashboardData.pendingReviews],
+      ['Total Transactions', dashboardData.totalTransactions],
+      ['Total Platform Value', dashboardData.totalValue],
+      [''],
+      ['Monthly Growth'],
+      ['User Growth', dashboardData.monthlyGrowth.users],
+      ['Property Growth', dashboardData.monthlyGrowth.properties],
+      ['Transaction Growth', dashboardData.monthlyGrowth.transactions],
+      [''],
+      ['Recent Activity'],
+      ['Type', 'Message', 'User', 'Time'],
+      ...dashboardData.recentActivity.map((activity: any) => [
+        activity.type,
+        activity.message,
+        activity.user,
+        new Date(activity.timestamp).toLocaleString()
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `propchain_dashboard_report_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleAnalytics = () => {
+    window.location.href = '/admin/analytics';
+  };
+
+  const handlePropertyAction = async (propertyId: string, action: string, propertyName: string) => {
+    try {
+      await dataService.updatePropertyStatus(propertyId, action);
+      alert(`Property "${propertyName}" ${action === 'approved' ? 'approved' : 'rejected'} successfully!`);
+      // Refresh data after action
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error updating property:', error);
+      alert('Error updating property. Please try again.');
+    }
+  };
 
   if (!isAdmin) {
     return (
@@ -208,8 +322,23 @@ export default function AdminDashboard() {
               <Shield className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-100 mb-4">Access Denied</h2>
-          <p className="text-gray-300 mb-6">You need admin privileges to access this panel</p>
+          <h2 className="text-2xl font-bold text-gray-100 mb-2">Access Denied</h2>
+          <p className="text-gray-400">Admin privileges required to access this dashboard.</p>
+        </FuturisticCard>
+      </div>
+    );
+  }
+
+  if (loading && !dashboardData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <AnimatedBackground />
+        <FuturisticCard className="text-center max-w-md">
+          <div className="flex justify-center mb-4">
+            <RefreshCw className="w-8 h-8 text-cyan-400 animate-spin" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-100 mb-2">Loading Dashboard</h2>
+          <p className="text-gray-400">Fetching real-time data...</p>
         </FuturisticCard>
       </div>
     );
@@ -227,65 +356,171 @@ export default function AdminDashboard() {
               Admin Dashboard
             </h1>
             <p className="text-gray-300 text-lg">PropChain Platform Management</p>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              Welcome back, {adminName}
+            <div className="flex items-center gap-4 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                Welcome back, {adminName}
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-3 h-3" />
+                Last updated: {lastRefresh.toLocaleTimeString()}
+              </div>
             </div>
           </div>
           
           <div className="flex gap-3">
-            <button className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-gray-100 hover:bg-white/20 transition-all duration-300 flex items-center gap-2">
+            <button 
+              onClick={fetchDashboardData}
+              disabled={refreshing}
+              className="px-4 py-2 rounded-xl bg-gray-800 border border-gray-600 text-gray-100 hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <button 
+              onClick={handleExportReport}
+              className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-gray-100 hover:bg-white/20 transition-all duration-300 flex items-center gap-2"
+            >
               <Download className="w-4 h-4" />
               Export Report
             </button>
-            <button className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 flex items-center gap-2">
+            <button 
+              onClick={handleAnalytics}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 flex items-center gap-2"
+            >
               <BarChart3 className="w-4 h-4" />
               Analytics
             </button>
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Real-time Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <AdminStatsCard 
-            icon={Building}
-            title="Total Properties"
-            value="147"
-            subtitle="Properties Listed"
+            icon={Users}
+            title="Total Users"
+            value={dashboardData?.totalUsers?.toLocaleString() || '0'}
+            subtitle={`${dashboardData?.activeUsers?.toLocaleString() || '0'} Active`}
             color="from-blue-500 to-cyan-500"
-            trend="+12%"
+            trend={dashboardData?.monthlyGrowth?.users || '+0%'}
             delay={0}
+          />
+          <AdminStatsCard 
+            icon={Building}
+            title="Properties"
+            value={dashboardData?.totalProperties?.toLocaleString() || '0'}
+            subtitle="Listed Properties"
+            color="from-green-500 to-emerald-500"
+            trend={dashboardData?.monthlyGrowth?.properties || '+0%'}
+            delay={100}
           />
           <AdminStatsCard 
             icon={Clock}
             title="Pending Reviews" 
-            value="23"
+            value={dashboardData?.pendingReviews?.toString() || '0'}
             subtitle="Awaiting Approval"
             color="from-yellow-500 to-orange-500"
             trend="+5"
             delay={200}
           />
           <AdminStatsCard 
-            icon={Bot}
-            title="AI Analysis"
-            value="89%"
-            subtitle="Automation Rate"
+            icon={DollarSign}
+            title="Total Value"
+            value={dashboardData?.totalValue || '$0'}
+            subtitle={`${dashboardData?.totalTransactions?.toLocaleString() || '0'} Transactions`}
             color="from-purple-500 to-pink-500"
-            trend="+3%"
-            delay={400}
-          />
-          <AdminStatsCard 
-            icon={Users}
-            title="Active Users"
-            value="1,247"
-            subtitle="Platform Users"
-            color="from-green-500 to-emerald-500"
-            trend="+8%"
-            delay={600}
+            trend={dashboardData?.monthlyGrowth?.transactions || '+0%'}
+            delay={300}
           />
         </div>
 
-        {/* Main Content Grid */}
+        {/* Real-time Activity Feed */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <FuturisticCard hover={false}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-100 flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-cyan-400" />
+                  Real-time Activity
+                </h3>
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  Live Updates
+                </div>
+              </div>
+              
+              <div className="space-y-4 max-h-80 overflow-y-auto">
+                {dashboardData?.recentActivity?.map((activity: any, index: number) => (
+                  <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                    <div className={`p-2 rounded-lg ${
+                      activity.type === 'property_approved' ? 'bg-green-500/20' :
+                      activity.type === 'user_registered' ? 'bg-blue-500/20' :
+                      'bg-yellow-500/20'
+                    }`}>
+                      {activity.type === 'property_approved' ? <CheckCircle className="w-4 h-4 text-green-400" /> :
+                       activity.type === 'user_registered' ? <Users className="w-4 h-4 text-blue-400" /> :
+                       <Bell className="w-4 h-4 text-yellow-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-100 truncate">{activity.message}</p>
+                      <p className="text-xs text-gray-400">
+                        by {activity.user} • {new Date(activity.timestamp).toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
+                )) || (
+                  <div className="text-center py-8 text-gray-400">
+                    <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p>Loading activity feed...</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </FuturisticCard>
+
+          <FuturisticCard hover={false}>
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-100 mb-6 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-purple-400" />
+                Performance Trends
+              </h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-100">User Growth</span>
+                    <span className="text-sm text-green-400">{dashboardData?.monthlyGrowth?.users || '+0%'}</span>
+                  </div>
+                  <div className="w-full bg-gray-700/50 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full transition-all duration-1000" style={{ width: '85%' }}></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-100">Property Listings</span>
+                    <span className="text-sm text-green-400">{dashboardData?.monthlyGrowth?.properties || '+0%'}</span>
+                  </div>
+                  <div className="w-full bg-gray-700/50 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-1000" style={{ width: '72%' }}></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-100">Transaction Volume</span>
+                    <span className="text-sm text-green-400">{dashboardData?.monthlyGrowth?.transactions || '+0%'}</span>
+                  </div>
+                  <div className="w-full bg-gray-700/50 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-1000" style={{ width: '94%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FuturisticCard>
+        </div>
+
+        {/* Property Review Queue */}
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Property Queue */}
           <div className="lg:col-span-2 space-y-6">
@@ -332,7 +567,7 @@ export default function AdminDashboard() {
                       { id: 3, title: 'Retail Shopping Center', status: 'under_review', aiScore: 95, submittedBy: 'Bob Johnson' },
                       { id: 4, title: 'Industrial Warehouse', status: 'pending', aiScore: 78, submittedBy: 'Alice Brown' }
                     ].map((property, index) => (
-                      <tr key={property.id} className={`group hover:bg-white/5 transition-all duration-500 transform ${index % 2 === 0 ? 'translate-x-0' : 'translate-x-1'} opacity-100 border-b border-white/5 hover:border-white/10`}>
+                      <tr key={property.id} className="group hover:bg-white/5 transition-all duration-500 border-b border-white/5 hover:border-white/10">
                         <td className="px-4 py-4">
                           <div>
                             <div className="font-medium text-gray-100 group-hover:text-cyan-300 transition-colors">
@@ -357,13 +592,25 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex gap-2">
-                            <button className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition-colors" title="Review">
+                            <button 
+                              onClick={() => window.location.href = '/admin/properties/review'}
+                              className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition-colors" 
+                              title="Review"
+                            >
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button className="p-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors" title="Approve">
+                            <button 
+                              onClick={() => handlePropertyAction(property.id.toString(), 'approved', property.title)}
+                              className="p-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors" 
+                              title="Approve"
+                            >
                               <CheckCircle className="w-4 h-4" />
                             </button>
-                            <button className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors" title="Reject">
+                            <button 
+                              onClick={() => handlePropertyAction(property.id.toString(), 'rejected', property.title)}
+                              className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors" 
+                              title="Reject"
+                            >
                               <XCircle className="w-4 h-4" />
                             </button>
                           </div>
@@ -374,12 +621,6 @@ export default function AdminDashboard() {
                 </table>
               </div>
             </FuturisticCard>
-          </div>
-
-          {/* Right Column - Quick Actions & Activity */}
-          <div className="space-y-6">
-            <QuickActions />
-            <RecentActivity />
           </div>
         </div>
       </div>

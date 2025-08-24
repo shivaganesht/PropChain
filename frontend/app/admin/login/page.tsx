@@ -103,15 +103,15 @@ const DemoCredentials = () => (
       <AlertTriangle className="w-4 h-4 text-yellow-400" />
       <span className="text-sm font-medium text-yellow-300">Demo Credentials</span>
     </div>
-    <div className="space-y-2 text-xs text-gray-300">
+    <div className="space-y-2 text-xs text-gray-900">
       <div>
-        <span className="font-medium text-yellow-400">Super Admin:</span> admin@propchain.com / admin123
+        <span className="font-medium text-yellow-600">Super Admin:</span> admin@propchain.com / admin123
       </div>
       <div>
-        <span className="font-medium text-blue-400">Moderator:</span> moderator@propchain.com / mod123
+        <span className="font-medium text-blue-600">Moderator:</span> moderator@propchain.com / mod123
       </div>
       <div>
-        <span className="font-medium text-green-400">Analyst:</span> analyst@propchain.com / analyst123
+        <span className="font-medium text-green-600">Analyst:</span> analyst@propchain.com / analyst123
       </div>
     </div>
   </div>
@@ -188,17 +188,17 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 w-5 h-5" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-900 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
                   placeholder="Enter your admin email"
                   required
                 />
@@ -207,17 +207,17 @@ export default function AdminLogin() {
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 w-5 h-5" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-900 placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
                   placeholder="Enter your password"
                   required
                 />
@@ -257,9 +257,9 @@ export default function AdminLogin() {
           {/* Security Notice */}
           <div className="mt-6 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <div className="flex items-start gap-2">
-              <Shield className="w-4 h-4 text-blue-400 mt-0.5" />
-              <div className="text-xs text-gray-300">
-                <span className="font-medium text-blue-300">Security Notice:</span> Admin sessions expire after 24 hours. All admin activities are logged and monitored.
+              <Shield className="w-4 h-4 text-blue-800 mt-0.5" />
+              <div className="text-xs text-gray-900">
+                <span className="font-medium text-blue-700">Security Notice:</span> Admin sessions expire after 24 hours. All admin activities are logged and monitored.
               </div>
             </div>
           </div>
