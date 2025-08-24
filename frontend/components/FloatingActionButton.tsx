@@ -34,7 +34,7 @@ export default function FloatingActionButton() {
                 transition={{ delay: 0.1 }}
                 className="flex items-center gap-3"
               >
-                <span className="bg-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium whitespace-nowrap">
+                <span className="bg-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium whitespace-nowrap text-gray-900">
                   List Property
                 </span>
                 <Link
@@ -53,7 +53,7 @@ export default function FloatingActionButton() {
               transition={{ delay: 0.2 }}
               className="flex items-center gap-3"
             >
-              <span className="bg-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium whitespace-nowrap">
+              <span className="bg-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium whitespace-nowrap text-gray-900">
                 Browse Properties
               </span>
               <Link
@@ -69,7 +69,7 @@ export default function FloatingActionButton() {
       </AnimatePresence>
 
       <motion.button
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.2 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
         className={`${

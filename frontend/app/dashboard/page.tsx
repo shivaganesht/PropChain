@@ -254,7 +254,7 @@ const ListPropertyModal = ({ onClose }: { onClose: () => void }) => (
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Property Type</label>
+            <label className="block text-sm font-medium text-gray-100 mb-2">Property Type</label>
             <select className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 focus:border-cyan-500 focus:outline-none transition-colors">
               <option>Commercial</option>
               <option>Residential</option>
@@ -332,9 +332,14 @@ const EditPropertyModal = ({ property, onClose, onSave }: {
     onClose();
   };
 
+  const handleSave = () => {
+    onSave({ ...property, ...formData });
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose}></div>
       <FuturisticCard className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto" hover={false}>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -355,20 +360,22 @@ const EditPropertyModal = ({ property, onClose, onSave }: {
               type="text" 
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
               required
+              placeholder="Enter Property Title"
             />
           </div>
           
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Total Tokens</label>
+              <label className="block text-sm font-medium text-gray-100 mb-2">Total Tokens</label>
               <input 
                 type="number" 
                 value={formData.totalTokens}
                 onChange={(e) => setFormData({...formData, totalTokens: parseInt(e.target.value)})}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
                 required
+                placeholder="Enter Total Tokens"
               />
             </div>
             <div>
@@ -377,8 +384,9 @@ const EditPropertyModal = ({ property, onClose, onSave }: {
                 type="number" 
                 value={formData.monthlyRent}
                 onChange={(e) => setFormData({...formData, monthlyRent: parseInt(e.target.value)})}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
                 required
+                placeholder="Enter Montly Rent..."
               />
             </div>
           </div>
@@ -389,7 +397,7 @@ const EditPropertyModal = ({ property, onClose, onSave }: {
               rows={4}
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-600 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors resize-none"
               placeholder="Property description..."
             />
           </div>
@@ -398,7 +406,7 @@ const EditPropertyModal = ({ property, onClose, onSave }: {
             <GlowButton variant="outline" onClick={onClose}>
               Cancel
             </GlowButton>
-            <GlowButton variant="primary" onClick={() => {}}>
+            <GlowButton variant="primary" onClick={handleSave}>
               <Edit className="w-4 h-4" />
               Save Changes
             </GlowButton>
@@ -412,7 +420,7 @@ const EditPropertyModal = ({ property, onClose, onSave }: {
 // View Property Modal Component  
 const ViewPropertyModal = ({ property, onClose }: { property: any; onClose: () => void }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+    <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose}></div>
     <FuturisticCard className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto" hover={false}>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-100 to-blue-200 bg-clip-text text-transparent">
@@ -430,11 +438,11 @@ const ViewPropertyModal = ({ property, onClose }: { property: any; onClose: () =
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-100 mb-1">Property Title</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Property Title</label>
               <p className="text-lg font-semibold text-gray-100">{property?.title}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Status</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
               <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
                 property?.status === 'active' 
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
@@ -444,22 +452,22 @@ const ViewPropertyModal = ({ property, onClose }: { property: any; onClose: () =
               </span>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Monthly Rent</label>
-              <p className="text-lg font-semibold text-gray-600">${property?.monthlyRent?.toLocaleString()}</p>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Monthly Rent</label>
+              <p className="text-lg font-semibold text-gray-100">${property?.monthlyRent?.toLocaleString()}</p>
             </div>
           </div>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Total Revenue</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Total Revenue</label>
               <p className="text-lg font-semibold text-green-400">${property?.revenue?.toLocaleString()}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Token Progress</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Token Progress</label>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Sold: {property?.soldTokens}</span>
-                  <span className="text-gray-400">Total: {property?.totalTokens}</span>
+                  <span className="text-gray-200">Sold: {property?.soldTokens}</span>
+                  <span className="text-gray-200">Total: {property?.totalTokens}</span>
                 </div>
                 <div className="w-full bg-gray-700/50 rounded-full h-3">
                   <div 
@@ -467,7 +475,7 @@ const ViewPropertyModal = ({ property, onClose }: { property: any; onClose: () =
                     style={{ width: `${(property?.soldTokens / property?.totalTokens) * 100}%` }}
                   ></div>
                 </div>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-200">
                   {((property?.soldTokens / property?.totalTokens) * 100).toFixed(1)}% Complete
                 </p>
               </div>
@@ -494,7 +502,7 @@ export default function Dashboard() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
-  const [userProperties] = useState([
+  const [userProperties, setUserProperties] = useState([
     {
       id: '1',
       title: 'Modern Office Complex',
@@ -532,6 +540,16 @@ export default function Dashboard() {
   const handleEditProperty = (property: any) => {
     setSelectedProperty(property);
     setShowEditModal(true);
+  };
+
+  const handleSaveProperty = (updatedProperty: any) => {
+    setUserProperties(prevProperties => 
+      prevProperties.map(property => 
+        property.id === updatedProperty.id ? updatedProperty : property
+      )
+    );
+    setShowEditModal(false);
+    setSelectedProperty(null);
   };
 
   if (!isConnected) {
@@ -683,13 +701,7 @@ export default function Dashboard() {
               setShowEditModal(false);
               setSelectedProperty(null);
             }}
-            onSave={(updatedProperty) => {
-              // In a real app, this would update the property in the database
-              console.log('Updated property:', updatedProperty);
-              // For now, we'll just close the modal
-              setShowEditModal(false);
-              setSelectedProperty(null);
-            }}
+            onSave={handleSaveProperty}
           />
         )}
 
