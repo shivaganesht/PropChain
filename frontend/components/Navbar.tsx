@@ -56,23 +56,13 @@ export default function Navbar() {
               </Link>
               
               {isConnected && (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    <User className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                  
-                  <Link
-                    href="/my-properties"
-                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span>My Properties</span>
-                  </Link>
-                </>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  <User className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
               )}
               
               {showAdminLink && (
