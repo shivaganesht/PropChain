@@ -113,28 +113,26 @@ class AdminDataService {
     }
   }
 
-  // Real-time data with enhanced realism
+  // Real-time data with enhanced realism (deterministic for SSR)
   private getMockDashboardData() {
-    const now = new Date();
-    const thisMonth = now.getMonth() + 1;
-    const currentYear = now.getFullYear();
+    const baseDate = new Date('2024-01-16');
+    const currentDate = new Date();
     
-    // Generate realistic dates
-    const generateRecentDates = (count: number) => {
-      return Array.from({ length: count }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        return date.toISOString();
-      });
+    // Generate deterministic "random" values based on current date
+    const daysSinceBase = Math.floor((currentDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+    const seed = daysSinceBase % 100;
+    
+    const deterministicRandom = (multiplier: number) => {
+      return ((seed * multiplier) % 100) / 100;
     };
 
     return {
-      totalUsers: 2847 + Math.floor(Math.random() * 50),
-      activeUsers: 1923 + Math.floor(Math.random() * 30),
-      totalProperties: 1247 + Math.floor(Math.random() * 20),
-      pendingReviews: 23 + Math.floor(Math.random() * 10),
-      totalTransactions: 5643 + Math.floor(Math.random() * 100),
-      totalValue: '$' + (24.7 + Math.random() * 2).toFixed(1) + 'M',
+      totalUsers: 2847 + Math.floor(deterministicRandom(1) * 50),
+      activeUsers: 1923 + Math.floor(deterministicRandom(2) * 30),
+      totalProperties: 1247 + Math.floor(deterministicRandom(3) * 20),
+      pendingReviews: 23 + Math.floor(deterministicRandom(4) * 10),
+      totalTransactions: 5643 + Math.floor(deterministicRandom(5) * 100),
+      totalValue: '$' + (24.7 + deterministicRandom(6) * 2).toFixed(1) + 'M',
       monthlyGrowth: {
         users: '+12.5%',
         properties: '+8.3%',
@@ -146,7 +144,7 @@ class AdminDataService {
           type: 'property_approved',
           message: 'Luxury Downtown Condo approved',
           user: 'Admin',
-          timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
+          timestamp: new Date(currentDate.getTime() - 5 * 60000).toISOString(),
           data: { propertyId: 'PROP_001', value: '$850K' }
         },
         {
@@ -154,48 +152,58 @@ class AdminDataService {
           type: 'user_registered',
           message: 'New user registration: Sarah Wilson',
           user: 'System',
-          timestamp: new Date(Date.now() - 12 * 60000).toISOString(),
-          data: { userId: 'USER_' + Math.random().toString(36).substr(2, 6) }
+          timestamp: new Date(currentDate.getTime() - 12 * 60000).toISOString(),
+          data: { userId: 'USER_12345' }
         },
         {
           id: 3,
           type: 'property_submitted',
           message: 'Commercial Building submitted for review',
           user: 'John Smith',
-          timestamp: new Date(Date.now() - 45 * 60000).toISOString(),
-          data: { propertyId: 'PROP_' + Math.random().toString(36).substr(2, 6) }
+          timestamp: new Date(currentDate.getTime() - 45 * 60000).toISOString(),
+          data: { propertyId: 'PROP_12345' }
         }
       ],
       trends: {
-        daily: generateRecentDates(7).map((date, index) => ({
-          date,
-          users: 150 + Math.floor(Math.random() * 50),
-          properties: 12 + Math.floor(Math.random() * 8),
-          transactions: 45 + Math.floor(Math.random() * 20)
+        daily: Array.from({ length: 7 }, (_, index) => ({
+          date: new Date(currentDate.getTime() - (6 - index) * 24 * 60 * 60 * 1000).toISOString(),
+          users: 150 + Math.floor(deterministicRandom(10 + index) * 50),
+          properties: 12 + Math.floor(deterministicRandom(20 + index) * 8),
+          transactions: 45 + Math.floor(deterministicRandom(30 + index) * 20)
         })),
         monthly: Array.from({ length: 6 }, (_, i) => ({
-          month: new Date(currentYear, thisMonth - i - 1, 1).toLocaleDateString('en-US', { month: 'short' }),
-          users: 400 + Math.floor(Math.random() * 200),
-          properties: 120 + Math.floor(Math.random() * 50),
-          transactions: 800 + Math.floor(Math.random() * 300)
+          month: new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1).toLocaleDateString('en-US', { month: 'short' }),
+          users: 400 + Math.floor(deterministicRandom(40 + i) * 200),
+          properties: 120 + Math.floor(deterministicRandom(50 + i) * 50),
+          transactions: 800 + Math.floor(deterministicRandom(60 + i) * 300)
         })).reverse()
       }
     };
   }
 
   private getMockUsersData() {
-    const generateUser = (index: number) => ({
-      id: `USER_${(index + 1).toString().padStart(4, '0')}`,
-      name: ['John Smith', 'Sarah Wilson', 'Michael Johnson', 'Emily Davis', 'David Brown', 'Lisa Anderson', 'James Wilson', 'Maria Garcia'][index % 8] || `User ${index + 1}`,
-      email: `user${index + 1}@example.com`,
-      role: ['buyer', 'seller', 'buyer', 'seller', 'buyer'][index % 5],
-      walletAddress: `0x${Math.random().toString(16).substr(2, 40)}`,
-      joinDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-      propertiesOwned: Math.floor(Math.random() * 5),
-      totalInvestment: '$' + (Math.random() * 500000).toFixed(0),
-      status: ['active', 'active', 'active', 'pending', 'active'][index % 5],
-      lastActivity: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-    });
+    const generateUser = (index: number) => {
+      const deterministicRandom = (seed: number) => {
+        return ((index + seed) % 100) / 100;
+      };
+      
+      const baseDate = new Date('2024-01-01');
+      const joinDate = new Date(baseDate.getTime() + (index * 24 * 60 * 60 * 1000));
+      const lastActivity = new Date(baseDate.getTime() + ((index + 30) * 24 * 60 * 60 * 1000));
+      
+      return {
+        id: `USER_${(index + 1).toString().padStart(4, '0')}`,
+        name: ['John Smith', 'Sarah Wilson', 'Michael Johnson', 'Emily Davis', 'David Brown', 'Lisa Anderson', 'James Wilson', 'Maria Garcia'][index % 8] || `User ${index + 1}`,
+        email: `user${index + 1}@example.com`,
+        role: ['buyer', 'seller', 'buyer', 'seller', 'buyer'][index % 5],
+        walletAddress: `0x${(index + 1000).toString(16).padStart(40, '0')}`,
+        joinDate: joinDate.toISOString(),
+        propertiesOwned: Math.floor(deterministicRandom(1) * 5),
+        totalInvestment: '$' + (deterministicRandom(2) * 500000).toFixed(0),
+        status: ['active', 'active', 'active', 'pending', 'active'][index % 5],
+        lastActivity: lastActivity.toISOString()
+      };
+    };
 
     return {
       users: Array.from({ length: 50 }, (_, i) => generateUser(i)),
@@ -210,21 +218,30 @@ class AdminDataService {
     const locations = ['Downtown', 'Suburbs', 'Waterfront', 'Commercial District', 'Historic District'];
     const statuses = ['pending', 'under_review', 'approved', 'rejected'];
     
-    const generateProperty = (index: number) => ({
-      id: `PROP_${(index + 1).toString().padStart(4, '0')}`,
-      title: `${propertyTypes[index % 4]} Property ${index + 1}`,
-      description: `Premium ${propertyTypes[index % 4].toLowerCase()} property in ${locations[index % 5]}`,
-      location: `${locations[index % 5]}, Metropolitan Area`,
-      price: '$' + (Math.random() * 5000000 + 500000).toFixed(0),
-      size: Math.floor(Math.random() * 5000 + 1000) + ' sq ft',
-      type: propertyTypes[index % 4],
-      status: statuses[index % 4],
-      submittedBy: ['John Smith', 'Sarah Wilson', 'Michael Johnson', 'Emily Davis'][index % 4],
-      submittedDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-      aiScore: Math.floor(Math.random() * 20 + 80),
-      riskLevel: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
-      images: [`https://images.unsplash.com/photo-${1486406146926 + index}?w=400`]
-    });
+    const generateProperty = (index: number) => {
+      const deterministicRandom = (seed: number) => {
+        return ((index + seed) % 100) / 100;
+      };
+      
+      const baseDate = new Date('2024-01-01');
+      const submittedDate = new Date(baseDate.getTime() + (index * 24 * 60 * 60 * 1000));
+      
+      return {
+        id: `PROP_${(index + 1).toString().padStart(4, '0')}`,
+        title: `${propertyTypes[index % 4]} Property ${index + 1}`,
+        description: `Premium ${propertyTypes[index % 4].toLowerCase()} property in ${locations[index % 5]}`,
+        location: `${locations[index % 5]}, Metropolitan Area`,
+        price: '$' + (deterministicRandom(1) * 5000000 + 500000).toFixed(0),
+        size: Math.floor(deterministicRandom(2) * 5000 + 1000) + ' sq ft',
+        type: propertyTypes[index % 4],
+        status: statuses[index % 4],
+        submittedBy: ['John Smith', 'Sarah Wilson', 'Michael Johnson', 'Emily Davis'][index % 4],
+        submittedDate: submittedDate.toISOString(),
+        aiScore: Math.floor(deterministicRandom(3) * 20 + 80),
+        riskLevel: ['low', 'medium', 'high'][Math.floor(deterministicRandom(4) * 3)],
+        images: [`https://images.unsplash.com/photo-${1486406146926 + index}?w=400`]
+      };
+    };
 
     return {
       properties: Array.from({ length: 50 }, (_, i) => generateProperty(i)),
@@ -241,6 +258,12 @@ class AdminDataService {
   }
 
   private getMockAnalyticsData() {
+    const deterministicRandom = (seed: number) => {
+      return ((seed) % 100) / 100;
+    };
+    
+    const baseDate = new Date('2024-01-01');
+    
     return {
       overview: {
         totalRevenue: '$24.7M',
@@ -251,29 +274,29 @@ class AdminDataService {
       charts: {
         userGrowth: Array.from({ length: 12 }, (_, i) => ({
           month: new Date(2024, i, 1).toLocaleDateString('en-US', { month: 'short' }),
-          users: 200 + i * 150 + Math.floor(Math.random() * 100)
+          users: 200 + i * 150 + Math.floor(deterministicRandom(i + 1) * 100)
         })),
         propertyValues: Array.from({ length: 12 }, (_, i) => ({
           month: new Date(2024, i, 1).toLocaleDateString('en-US', { month: 'short' }),
-          value: 1.5 + i * 0.2 + Math.random() * 0.3
+          value: 1.5 + i * 0.2 + deterministicRandom(i + 13) * 0.3
         })),
         transactionVolume: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          volume: Math.floor(Math.random() * 50 + 20)
+          date: new Date(baseDate.getTime() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          volume: Math.floor(deterministicRandom(i + 25) * 50 + 20)
         }))
       },
       topPerformers: {
         properties: Array.from({ length: 5 }, (_, i) => ({
           id: `PROP_${i + 1}`,
           title: `Top Property ${i + 1}`,
-          value: '$' + (Math.random() * 2000000 + 1000000).toFixed(0),
-          roi: '+' + (Math.random() * 20 + 10).toFixed(1) + '%'
+          value: '$' + (deterministicRandom(i + 37) * 2000000 + 1000000).toFixed(0),
+          roi: '+' + (deterministicRandom(i + 43) * 20 + 10).toFixed(1) + '%'
         })),
         users: Array.from({ length: 5 }, (_, i) => ({
           id: `USER_${i + 1}`,
           name: ['John Smith', 'Sarah Wilson', 'Michael Johnson', 'Emily Davis', 'David Brown'][i],
-          totalInvestment: '$' + (Math.random() * 1000000 + 500000).toFixed(0),
-          properties: Math.floor(Math.random() * 10 + 1)
+          totalInvestment: '$' + (deterministicRandom(i + 49) * 1000000 + 500000).toFixed(0),
+          properties: Math.floor(deterministicRandom(i + 55) * 10 + 1)
         }))
       }
     };

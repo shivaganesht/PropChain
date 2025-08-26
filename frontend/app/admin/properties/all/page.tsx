@@ -77,22 +77,31 @@ export default function AllProperties() {
       ];
 
       const mockProperties: Property[] = Array.from({ length: 50 }, (_, i) => {
-        const tokens = Math.floor(Math.random() * 5000) + 500;
-        const sold = Math.floor(Math.random() * tokens);
-        const value = tokens * (Math.floor(Math.random() * 200) + 50);
+        // Use deterministic values based on index
+        const deterministicRandom = (seed: number) => {
+          return ((i + seed) % 100) / 100;
+        };
+        
+        const tokens = Math.floor(deterministicRandom(1) * 5000) + 500;
+        const sold = Math.floor(deterministicRandom(2) * tokens);
+        const value = tokens * (Math.floor(deterministicRandom(3) * 200) + 50);
+        
+        const baseDate = new Date('2024-01-01');
+        const listedDate = new Date(baseDate.getTime() + (i * 24 * 60 * 60 * 1000));
+        const lastUpdate = new Date(listedDate.getTime() + (7 * 24 * 60 * 60 * 1000));
         
         return {
           id: `prop_${i + 1}`,
           title: `Property ${i + 1}`,
-          type: types[Math.floor(Math.random() * types.length)],
-          location: locations[Math.floor(Math.random() * locations.length)],
+          type: types[Math.floor(deterministicRandom(4) * types.length)],
+          location: locations[Math.floor(deterministicRandom(5) * locations.length)],
           value,
           tokens,
           sold,
-          status: statuses[Math.floor(Math.random() * statuses.length)],
-          owner: `User ${Math.floor(Math.random() * 100) + 1}`,
-          listedDate: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          lastUpdate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+          status: statuses[Math.floor(deterministicRandom(6) * statuses.length)],
+          owner: `User ${Math.floor(deterministicRandom(7) * 100) + 1}`,
+          listedDate: listedDate.toISOString().split('T')[0],
+          lastUpdate: lastUpdate.toISOString().split('T')[0]
         };
       });
 

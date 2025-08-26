@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import useIsClient from '@/hooks/useIsClient';
 import { 
   Shield, 
   Users, 
@@ -224,6 +225,7 @@ const RecentActivity = () => {
 // Admin Dashboard Main Component
 export default function AdminDashboard() {
   const { isAdmin, adminName } = useAdminAuth();
+  const isClient = useIsClient();
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -324,6 +326,22 @@ export default function AdminDashboard() {
           </div>
           <h2 className="text-2xl font-bold text-gray-100 mb-2">Access Denied</h2>
           <p className="text-gray-400">Admin privileges required to access this dashboard.</p>
+        </FuturisticCard>
+      </div>
+    );
+  }
+
+  // Prevent hydration mismatch by only rendering on client
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <AnimatedBackground />
+        <FuturisticCard className="text-center max-w-md">
+          <div className="flex justify-center mb-4">
+            <RefreshCw className="w-8 h-8 text-cyan-400 animate-spin" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-100 mb-2">Loading Dashboard...</h3>
+          <p className="text-gray-400">Initializing admin interface</p>
         </FuturisticCard>
       </div>
     );
