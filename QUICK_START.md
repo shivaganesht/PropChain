@@ -89,7 +89,7 @@ Open http://localhost:3000 in your browser
 - Confirm transaction in MetaMask
 
 ### 4. View Ownership
-- Check Dashboard to view your properties
+- Check "My Properties" page
 - View ownership percentage
 - Track rental income
 

@@ -44,6 +44,7 @@ const config = getDefaultConfig({
 });
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = React.useState(false);
   const [queryClient] = React.useState(() => new QueryClient({
     defaultOptions: {
       queries: {
@@ -52,11 +53,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
     },
   }));
 
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider modalSize="compact">
-          {children}
+          {mounted && children}
           <Toaster
             position="top-right"
             toastOptions={{
